@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dream Radio Deluxe</title>
+  <style>
+    :root {
+      --primary: #ff00cc;
+      --secondary: #00c3ff;
+      --accent: #ff6b35;
+      --bg-dark: #0a0a0f;
+      --bg-light: #f8f9fa;
+      --text-dark: #ffffff;
+      --text-light: #1a1a1a;
+      --card-dark: #1a1a2e;
+      --card-light: #ffffff;
+      --glass-dark: rgba(26, 26, 46, 0.8);
+      --glass-light: rgba(255, 255, 255, 0.85);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body.dark {
+      background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a2e 50%, var(--bg-dark) 100%);
+      color: var(--text-dark);
+    }
+
+    body.light {
+      background: linear-gradient(135deg, var(--bg-light) 0%, #e8f4f8 50%, var(--bg-light) 100%);
+      color: var(--text-light);
+    }
+
+    /* Animated background particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--secondary);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    /* Header with glassmorphism */
+    header {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      color: white;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      opacity: 0.9;
+      font-style: italic;
+    }
+
+    /* Enhanced buttons */
+    .buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 2rem 1rem;
+    }
+
+    .buttons button,
+    .buttons a {
+      background: transparent;
+      border: 2px solid var(--secondary);
+      color: var(--secondary);
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 15px rgba(0, 195, 255, 0.2);
+    }
+
+    .buttons button::before,
+    .buttons a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 195, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .buttons button:hover::before,
+    .buttons a:hover::before {
+      left: 100%;
+    }
+
+    .buttons button:hover,
+    .buttons a:hover {
+      background: var(--secondary);
+      color: #000;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(0, 195, 255, 0.4);
+    }
+
+    /* Enhanced sections with glassmorphism */
+    .section {
+      width: 90%;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: 25px;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dark .section {
+      background: linear-gradient(135deg, rgba(26, 26, 46, 0.85), rgba(10, 10, 15, 0.85));
+    }
+
+    .light .section {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
+    }
+
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+      background-size: 200% 100%;
+      animation: gradientShift 4s ease-in-out infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .section:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .section h2 {
+      text-align: center;
+      color: var(--secondary);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      position: relative;
+    }
+
+    .section h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+
+    /* Enhanced audio player */
+    .audio-container {
+      position: relative;
+      margin: 2rem 0;
+    }
+
+    audio {
+      width: 100%;
+      border-radius: 15px;
+      outline: none;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    audio::-webkit-media-controls-panel {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    /* Ripple effect on buttons */
+    .ripple {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ripple::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .ripple:active::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* Enhanced now playing display */
+    #now-playing {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary);
+      padding: 1rem;
+      background: rgba(255, 0, 204, 0.1);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 0, 204, 0.3);
+      backdrop-filter: blur(5px);
+      animation: glow 2s ease-in-out infinite alternate;
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 10px rgba(255, 0, 204, 0.3); }
+      to { box-shadow: 0 0 20px rgba(255, 0, 204, 0.6); }
+    }
+
+    /* Volume control */
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+      justify-content: center;
+    }
+
+    .volume-slider {
+      width: 150px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      width: 20px;
+      height: 20px;
+      background: var(--secondary);
+      border-radius: 50%;
+      cursor: pointer;
+      -webkit-appearance: none;
+      box-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+    }
+
+    /* Chat container enhancement */
+    .chat-container {
+      height: 650px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(255, 0, 204, 0.1), rgba(0, 195, 255, 0.1));
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .chat-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Enhanced footer */
+    footer {
+      height: 150px;
+      background: linear-gradient(135deg, rgba(255, 0, 204, 0.2), rgba(0, 195, 255, 0.2), rgba(255, 107, 53, 0.2));
+      backdrop-filter: blur(25px);
+      border-top: 2px solid rgba(255, 255, 255, 0.3);
+      margin-top: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: footerShimmer 5s ease-in-out infinite;
+    }
+
+    footer::after {
+      content: '🎵';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      opacity: 0.3;
+      animation: footerPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes footerShimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes footerPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.5rem;
+      }
+
+      .section {
+        width: 95%;
+        padding: 1.5rem;
+        margin: 1rem auto;
+      }
+
+      .chat-container {
+        height: 550px;
+      }
+
+      .buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .buttons button,
+      .buttons a {
+        width: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      header p {
+        font-size: 1rem;
+      }
+
+      .section {
+        padding: 1rem;
+      }
+
+      .chat-container {
+        height: 450px;
+      }
+    }
+
+    /* Floating music notes animation */
+    .music-notes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .music-note {
+      position: absolute;
+      font-size: 20px;
+      color: var(--secondary);
+      opacity: 0.3;
+      animation: musicFloat 8s ease-in-out infinite;
+    }
+
+    @keyframes musicFloat {
+      0% { 
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% { 
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Enhanced neon glow effects */
+    .neon-border {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .neon-border::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+      background-size: 200% 200%;
+      animation: neonPulse 3s ease-in-out infinite;
+      border-radius: inherit;
+      z-index: -1;
+      filter: blur(8px);
+    }
+
+    @keyframes neonPulse {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Enhanced card with 3D effect */
+    .enhanced-card {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    .enhanced-card:hover {
+      transform: rotateX(5deg) rotateY(-5deg) translateZ(50px);
+    }
+
+    /* Audio visualizer */
+    .visualizer {
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+      height: 100px;
+      margin: 1rem 0;
+      gap: 3px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .visualizer.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .visualizer-bar {
+      width: 4px;
+      background: linear-gradient(to top, var(--primary), var(--secondary));
+      border-radius: 2px;
+      animation: visualizerPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes visualizerPulse {
+      0%, 100% { height: 10px; }
+      50% { height: 60px; }
+    }
+
+    /* Floating mode */
+    body.floating-mode {
+      overflow: hidden;
+    }
+
+    .floating-mode .section {
+      animation: floatingBounce 4s ease-in-out infinite;
+    }
+
+    @keyframes floatingBounce {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Enhanced now playing with spectrum */
+    .now-playing-container {
+      position: relative;
+      margin-top: 1.5rem;
+    }
+
+    .spectrum-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        rgba(255, 0, 204, 0.1) 0%, 
+        rgba(0, 195, 255, 0.1) 25%, 
+        rgba(255, 107, 53, 0.1) 50%, 
+        rgba(0, 195, 255, 0.1) 75%, 
+        rgba(255, 0, 204, 0.1) 100%);
+      background-size: 200% 100%;
+      animation: spectrumFlow 3s ease-in-out infinite;
+      border-radius: 15px;
+      opacity: 0.5;
+    }
+
+    @keyframes spectrumFlow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Holographic effect */
+    .holographic {
+      position: relative;
+      background: linear-gradient(45deg, 
+        rgba(255, 0, 204, 0.1), 
+        rgba(0, 195, 255, 0.1), 
+        rgba(255, 107, 53, 0.1),
+        rgba(0, 255, 127, 0.1));
+      background-size: 400% 400%;
+      animation: holographicShift 8s ease-in-out infinite;
+    }
+
+    @keyframes holographicShift {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 100% 50%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Cyberpunk grid overlay */
+    .cyber-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 195, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 195, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: -2;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    /* Connection status indicator */
+    .status-indicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+
+    .status-online {
+      background: rgba(0, 255, 0, 0.2);
+      color: #00ff00;
+      border: 1px solid rgba(0, 255, 0, 0.5);
+    }
+
+    .status-offline {
+      background: rgba(255, 0, 0, 0.2);
+      color: #ff0000;
+      border: 1px solid rgba(255, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="dark">
+  <!-- Animated particles background -->
+  <div class="particles" id="particles"></div>
+  
+  <!-- Floating music notes -->
+  <div class="music-notes" id="musicNotes"></div>
+  
+  <!-- Cyberpunk grid overlay -->
+  <div class="cyber-grid"></div>
+
+  <!-- Connection status -->
+  <div class="status-indicator status-online" id="status">🔴 LIVE</div>
+
+  <header>
+    <h1>🎧 Dream Radio</h1>
+    <p>Μελωδίες που ταξιδεύουν την ψυχή σου</p>
+  </header>
+
+  <div class="buttons">
+    <button class="ripple" onclick="toggleTheme()">🌗 Dark / Light</button>
+    <a class="ripple" href="https://service70.rumbletalk.net/1FRIn!AH/" target="_blank">💬 Chat</a>
+    <button class="ripple" onclick="shareStation()">📱 Κοινοποίηση</button>
+    <button class="ripple" onclick="toggleVisualizer()">🎨 Visualizer</button>
+    <button class="ripple" onclick="toggleFloatingMode()">🎪 Floating Mode</button>
+  </div>
+
+  <div class="section enhanced-card neon-border holographic">
+    <h2>🔊 Live Stream</h2>
+    <div class="audio-container">
+      <audio id="audioPlayer" controls autoplay>
+        <source src="https://sp3.streams.ovh/8056/stream" type="audio/mpeg" />
+        Ο browser σου δεν υποστηρίζει την αναπαραγωγή ήχου.
+      </audio>
+      <div class="volume-control">
+        <span>🔊</span>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+        <span id="volumeValue">50%</span>
+      </div>
+      <div class="visualizer" id="visualizer">
+        <div class="visualizer-bar" style="animation-delay: 0s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.1s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.2s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.3s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.4s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.5s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.6s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.7s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.8s"></div>
+        <div class="visualizer-bar" style="animation-delay: 0.9s"></div>
+        <div class="visualizer-bar" style="animation-delay: 1.0s"></div>
+        <div class="visualizer-bar" style="animation-delay: 1.1s"></div>
+      </div>
+    </div>
+    <div class="now-playing-container">
+      <div class="spectrum-bg"></div>
+      <div id="now-playing">🎶 Αναζήτηση τίτλου... <div class="loading"></div></div>
+    </div>
+  </div>
+
+  <div class="section enhanced-card chat-container">
+    <iframe src="https://service70.rumbletalk.net/1FRIn!AH/"></iframe>
+  </div>
+
+  <footer></footer>
+
+  <script>
+    // Theme toggle with smooth transition
+    function toggleTheme() {
+      const body = document.body;
+      body.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      body.classList.toggle("dark");
+      body.classList.toggle("light");
+      
+      // Save theme preference
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    // Load saved theme
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.body.className = savedTheme;
+    }
+
+    // Enhanced popup player
+    function toggleVisualizer() {
+      const visualizer = document.getElementById('visualizer');
+      visualizer.classList.toggle('active');
+    }
+
+    // Toggle floating mode
+    function toggleFloatingMode() {
+      document.body.classList.toggle('floating-mode');
+    }
+
+    // Share station functionality
+    function shareStation() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Dream Radio Deluxe',
+          text: 'Άκου το Dream Radio - Μελωδίες που ταξιδεύουν την ψυχή σου!',
+          url: window.location.href
+        });
+      } else {
+        // Fallback for browsers that don't support Web Share API
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+          alert('Ο σύνδεσμος αντιγράφηκε στο clipboard!');
+        });
+      }
+    }
+
+    // Enhanced now playing fetch with better error handling
+    async function fetchNowPlaying() {
+      const nowPlayingElement = document.getElementById("now-playing");
+      
+      try {
+        const res = await fetch("https://sp3.streams.ovh:2199/rpc/dreamradio/streaminfo.get");
+        const data = await res.json();
+        const title = data.data[0]?.title || "Χωρίς τίτλο αυτή τη στιγμή";
+        
+        nowPlayingElement.innerHTML = `🎶 Τώρα παίζει: ${title}`;
+        updateConnectionStatus(true);
+      } catch (e) {
+        nowPlayingElement.innerHTML = "🎶 Σύνδεση με τον σταθμό...";
+        updateConnectionStatus(false);
+      }
+    }
+
+    // Connection status indicator
+    function updateConnectionStatus(online) {
+      const statusElement = document.getElementById("status");
+      if (online) {
+        statusElement.textContent = "🟢 LIVE";
+        statusElement.className = "status-indicator status-online";
+      } else {
+        statusElement.textContent = "🔴 OFFLINE";
+        statusElement.className = "status-indicator status-offline";
+      }
+    }
+
+    // Volume control
+    function initVolumeControl() {
+      const audioPlayer = document.getElementById("audioPlayer");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const volumeValue = document.getElementById("volumeValue");
+
+      volumeSlider.addEventListener("input", function() {
+        const volume = this.value / 100;
+        audioPlayer.volume = volume;
+        volumeValue.textContent = this.value + "%";
+      });
+
+      // Set initial volume
+      audioPlayer.volume = 0.5;
+    }
+
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById("particles");
+      const particleCount = 60;
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        particle.style.left = Math.random() * 100 + "%";
+        particle.style.top = Math.random() * 100 + "%";
+        particle.style.animationDelay = Math.random() * 6 + "s";
+        particle.style.animationDuration = (Math.random() * 4 + 4) + "s";
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    // Create floating music notes
+    function createMusicNotes() {
+      const musicNotesContainer = document.getElementById("musicNotes");
+      const notes = ['♪', '♫', '♬', '♩', '♭', '♯'];
+      
+      function addNote() {
+        const note = document.createElement("div");
+        note.className = "music-note";
+        note.textContent = notes[Math.floor(Math.random() * notes.length)];
+        note.style.left = Math.random() * 100 + "%";
+        note.style.fontSize = (Math.random() * 20 + 15) + "px";
+        note.style.animationDuration = (Math.random() * 4 + 6) + "s";
+        musicNotesContainer.appendChild(note);
+
+        // Remove note after animation
+        setTimeout(() => {
+          note.remove();
+        }, 8000);
+      }
+
+      // Add notes periodically
+      setInterval(addNote, 2000);
+    }
+
+    /* Loading animation */
+    const loadingStyles = `
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--secondary);
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 10px;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = loadingStyles;
+    document.head.appendChild(style);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      const audio = document.getElementById('audioPlayer');
+      
+      switch(e.key) {
+        case ' ':
+          e.preventDefault();
+          audio.paused ? audio.play() : audio.pause();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          audio.volume = Math.min(1, audio.volume + 0.1);
+          document.getElementById('volumeSlider').value = audio.volume * 100;
+          document.getElementById('volumeValue').textContent = Math.round(audio.volume * 100) + '%';
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          audio.volume = Math.max(0, audio.volume - 0.1);
+          document.getElementById('volumeSlider').value = audio.volume * 100;
+          document.getElementById('volumeValue').textContent = Math.round(audio.volume * 100) + '%';
+          break;
+        case 't':
+          toggleTheme();
+          break;
+      }
+    });
+
+    // Initialize everything
+    window.addEventListener('load', function() {
+      loadTheme();
+      createParticles();
+      createMusicNotes();
+      initVolumeControl();
+      fetchNowPlaying();
+      setInterval(fetchNowPlaying, 15000);
+    });
+
+    // Add smooth scrolling for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
